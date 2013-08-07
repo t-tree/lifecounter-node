@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+    
+    <head>
+        <title>Life-counter</title>
+        <link rel='stylesheet' href='/stylesheets/bootstrap.css'
+        />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"
+        />
+        <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+        <script type="text/javascript" src="/javascripts/bootstrap.js"></script>
+        <style>
+            body {
+                padding-top: 60px;
+            }
+        </style>
+    </head>
+    
+    <body>
+        <div class="navbar navbar-inverse navbar-fixed-top bs-docs-nav">
+            <div class="container">
+                <div class="btn-toolbar" style="text-align: left;float: left;"></div>
+                <div class="btn-toolbar" style="text-align: right"></div>
+            </div>
+        </div>
+        <div class="container" style="margin:10px">
+            <div class="page-header">
+                <h1>Life-counter</h1>
+                <p>Welcome to Life-counter</p>
+                <p>
+                    <a class="btn btn-primary btn-large" href=" 
+            <%= login_url %>">
+            <%= login_status %>
+          </a>
+                </p>
+            </div>
+        </div>
+    </body>
+
+</html>

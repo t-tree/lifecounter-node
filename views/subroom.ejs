@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>
+      <%= title %>
+    </title>
+    <link rel='stylesheet' href='/stylesheets/bootstrap.css' />
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+  </head>
+  <body>
+    <div class="container-fluid">
+      <div class="row">
+        <div class="span7">
+          <div class="page-header">
+            <h1>
+              <%= title %>
+            </h1>
+            <p>Welcome to 
+              <%= title %>
+            </p>
+            <p>
+              <a class="btn btn-primary btn-large" href="http://cloud9-sample.t-tree.c9.io/ 
+                <%= login_status %>/twitter">
+                <%= login_status %>
+              </a>
+            </p>
+          </div>
+        </div>
+        <div class="span5">
+          <form action="/room" method="get">
+            <button class="btn">ルーム作成 </button>
+          </form>
+          <form>
+            <fieldset>
+              <label>ルーム</label>
+              <input type="text" class="span3" placeholder="Type something…">
+              <button type="submit" class="btn">参加 </button>
+            </fieldset>
+          </form>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

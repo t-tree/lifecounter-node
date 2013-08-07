@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+    
+    <head>
+        <title>Life-counter</title>
+        <link rel='stylesheet' href='/stylesheets/bootstrap.css'
+        />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"
+        />
+        <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+        <script type="text/javascript" src="/javascripts/bootstrap.js"></script>
+        <style>
+            body {
+                padding-top: 60px;
+            }
+        </style>
+    </head>
+    
+    <body>
+        <div class="navbar navbar-inverse navbar-fixed-top bs-docs-nav">
+            <div class="container">
+                <div class="btn-toolbar" style="text-align: left;float: left;"></div>
+                <div class="btn-toolbar" style="text-align: right">
+                    <a type="button" class="btn btn-primary navbar-btn btn-small" style="text-align: right"
+                    href=" 
+            <%= login_url %>">
+            <%= login_status %>
+          </a>
+                </div>
+            </div>
+        </div>
+        <div class="container" style="margin:10px">
+            <div class="page-header">
+                <h1>Life-counter</h1>
+                <p>Welcome to Life-counter</p>
+            </div>
+            <div style="margin:20px">
+                <form class="form-inline" action="/create" method="get" style="margine-top: 20px;">
+                    <fieldset>
+                        <button class="btn btn-default">ルーム作成</button>
+                    </fieldset>
+                </form>
+            </div>
+            <div style="margin:20px">
+                <form class="form-inline" action="/join" method="post" style="margine-top: 20px;">
+                    <div class="input-group">
+                        <span class="input-group-btn">
+                            <button class="btn btn-default" type="submit" style="margine-top: 20px;">参加</button>
+                        </span>
+                        <input type="text" class="form-control" name="roomNumber">
+                    </div>
+                </form>
+            </div>
+            <div style="margin:20px">
+                <a class="btn btn-default" href="/room">再開</a>
+            </div>
+        </div>
+    </body>
+
+</html>

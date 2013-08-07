@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+    
+    <head>
+        <title>Life-counter</title>
+        <link rel='stylesheet' href='/stylesheets/bootstrap.css'
+        />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+        <script type="text/javascript" src="/javascripts/dropdown.js"></script>
+        <script type="text/javascript" src="/javascripts/bootstrap.js"></script>
+        <script type="text/javascript" src="/socket.io/socket.io.js"></script>
+        <script type="text/javascript" src="/javascripts/roomowner.js"></script>
+        <style>
+            body {
+                padding-top: 60px;
+            }
+        </style>
+    </head>
+    
+    <body>
+        <!-- Docs master nav -->
+        <div class="navbar navbar-inverse navbar-fixed-top bs-docs-nav">
+            <div class="container">
+                <div class="btn-toolbar" style="text-align: left;float: left;">
+                    <button type="button" class="btn btn-default navbar-btn btn-small" id="reset">リセット</button>
+                </div>
+                <div class="btn-toolbar" style="text-align: right">
+                    <a type="button" class="btn btn-primary navbar-btn btn-small" style="text-align: right"
+                    href="/exit">退出</a>
+                    <a type="button" class="btn btn-primary navbar-btn btn-small" style="text-align: right"
+                    href="/logout/twitter">logout</a>
+                </div>
+            </div>
+        </div>
+        <div class="container panel container">
+            <div class="row">
+                <div class="text-center">room:
+                    <em id="roomNumber">----</em>
+                </div>
+            </div>
+            <div class="row">
+                <div class="text-center">
+                    <h2 id="life">--</h2>
+                </div>
+            </div>
+            <div class="row container well text-center">
+                <p class="btn btn-info" style="margin-right:6px;margin-left:6px;" id="inc5">+5</p>
+                <p class="btn btn-info" style="margin-right:6px;margin-left:6px;"
+                id="inc1">+1</p>
+                <p class="btn btn-danger" style="margin-right:6px;margin-left:6px;"
+                id="dec1">-1</p>
+                <p class="btn btn-danger" style="margin-right:6px;margin-left:6px;"
+                id="dec5">-5</p>
+            </div>
+        </div>
+        <hr>
+        <div class="container">
+            <table class="table table-condensed" id="life-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Name</th>
+                        <th>Life</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </body>
+
+</html>
