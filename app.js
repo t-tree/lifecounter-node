@@ -2,8 +2,6 @@
  * Module dependencies.
  */
 
-console.log(process.env.TEST)
-
 var express = require('express'),
     routes = require('./routes'),
     http = require('http'),
@@ -302,6 +300,15 @@ function cleanRoom(req) {
 }
     
 var io = require('socket.io').listen(server);
+
+io.configure(function () {
+   //HerokuではWebSocketがまだサポートされていない？ので、以下の設定が必要 
+    io.set("transports", ["xhr-polling"]); 
+    io.set("polling duration", 10); 
+
+    // socket.ioのログ出力を抑制する
+    io.set('log level', 1);
+});
 
 io.set('authorization', function(handshakeData, callback) {
     if (handshakeData.headers.cookie) {
