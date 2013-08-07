@@ -1,12 +1,34 @@
 {
-  "name": "application-name",
+  "name": "lifecounter",
   "version": "0.0.1",
   "private": true,
   "scripts": {
     "start": "node app.js"
   },
   "dependencies": {
-    "express": "3.3.4",
-    "ejs": "*"
-  }
+#    "express": "3.3.4",
+#    "ejs": "*"
+    "ejs": "~0.8.4",
+    "connect": "~2.8.4",
+    "passport": "~0.1.17",
+    "passport-twitter": "~0.1.5",
+    "express": "~3.3.4",
+    "socket.io": "~0.9.16"
+  },
+  "description": "",
+  "main": "app.js",
+  "devDependencies": {
+    "ejs": "~0.8.4",
+    "connect": "~2.8.4",
+    "passport": "~0.1.17",
+    "passport-twitter": "~0.1.5",
+    "express": "~3.3.4",
+    "socket.io": "~0.9.16"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@heroku.com:lifecounter.git"
+  },
+  "author": "Truth.Tree",
+  "license": "BSD"
 }
