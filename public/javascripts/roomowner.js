@@ -1,5 +1,5 @@
 $(function() {
-    var socket = io.connect('http://cloud9-sample.t-tree.c9.io');
+    var socket = io.connect('http://lifecounter.herokuapp.com/');
 
     // サーバーと接続したタイミングでライフを取得（初期値はサーバーで生成している）
     socket.on('connect', function() {
