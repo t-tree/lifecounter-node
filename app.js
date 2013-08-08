@@ -101,22 +101,18 @@ app.get('/login', function(req, res) {
 app.get('/exit', function(req, res) {
     console.log('app.get(/exit)');
     if (req.isAuthenticated()) {
-        var _room = userList[req.session.user_name];
-        console.log('already entered room:' + userList[req.session.user_name]);
-        delete roomList[_room][req.session.user_name];
-        console.log('remove ' + req.session.user_name + ' from ' + userList[req.session.user_name]);
-        var length = 0;
-        for( var key in roomList[_room] ){ length++; } 
-        console.log(length);
-        if (length === 0) {
-            console.log('delete room : ' + _room);
-            delete roomList[_room];
+        if(req.session.user_name in userList){
+            removeFromRoomList(req);
+            deleteUserList(req);
+            req.flash('info','退出しました。');
+        } else {
+            console.log('untill entered room');
+            req.flash('alert','まだ部屋に入っていません。');
         }
-        delete userList[req.session.user_name];
-        console.log('remove ' + req.session.user_name + ' from userList');
-
+        res.redirect('/');
+    } else {
+        res.redirect('/');
     }
-    res.redirect('/');
 });
 
 app.get('/check', function(req, res) {
@@ -144,15 +140,8 @@ app.get('/create', function(req, res) {
 
         //すでに部屋に入っている場合は退出して作成
         if (req.session.user_name in userList) {
-            var _room = userList[req.session.user_name];
-            console.log('already entered room:' + userList[req.session.user_name]);
-            delete roomList[_room][req.session.user_name];
-            console.log('remove ' + req.session.user_name + ' from ' + userList[req.session.user_name]);
-            delete userList[req.session.user_name];
-            console.log('remove ' + req.session.user_name + ' from userList');
-            if (roomList[_room].length === 0) {
-                delete roomList[_room];
-            }
+            removeFromRoomList(req);
+            deleteUserList(req);
         }
 
         while (1) {
@@ -206,15 +195,8 @@ app.post('/join', function(req, res) {
 
         // すでにほかの部屋に入っている場合は退出する
         if (req.session.user_name in userList && userList[req.session.user_name] !== room) {
-            var _room = userList[req.session.user_name];
-            console.log('already entered room:' + userList[req.session.user_name]);
-            delete roomList[_room][req.session.user_name];
-            console.log('remove ' + req.session.user_name + ' from ' + userList[req.session.user_name]);
-            delete userList[req.session.user_name];
-            console.log('remove ' + req.session.user_name + ' from userList');
-            if (roomList[_room].length === 0) {
-                delete roomList[_room];
-            }
+            removeFromRoomList(req);
+            deleteUserList(req);
         }
 
         if (userList[req.session.user_name] !== room) {
@@ -248,6 +230,26 @@ app.get('/room', function(req, res) {
         res.redirect('/');
     }
 });
+
+function deleteUserList(_req){
+    var userName = _req.session.user_name;
+    delete userList[userName];
+    console.log('remove ' + userName + ' from userList');
+}
+
+function removeFromRoomList(_req){
+    var _room = userList[_req.session.user_name];
+    console.log('already entered room:' + userList[_req.session.user_name]);
+    delete roomList[_room][_req.session.user_name];
+    console.log('remove ' + _req.session.user_name + ' from ' + userList[_req.session.user_name]);
+    var length = 0;
+    for( var key in roomList[_room] ){ length++; } 
+    console.log(length);
+    if (length === 0) {
+        console.log('delete room : ' + _room);
+        delete roomList[_room];
+    }
+}
 
 var server = http.createServer(app).listen(app.get('port'), function() {
     console.log('Express server listening on port ' + app.get('port'));
@@ -307,7 +309,7 @@ app.get('/logout/twitter', function(req, res) {
     cleanRoom(req);
     req.logout();
     req.flash('info','ログアウトしました。');
-    res.redirect('/');
+    res.redirect('/login');
 });
 
 function twitterEnsureAuthenticated(req, res, next) {
