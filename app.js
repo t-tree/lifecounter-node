@@ -51,6 +51,10 @@ app.configure(function() {
 
     app.use(app.router);
     app.use(express.static(path.join(__dirname, 'public')));
+    app.use(function(req, res, next){
+        req.flash('alert','無効なurlです。');
+        res.redirect('/');
+    });
 });
 
 var roomList = {};
