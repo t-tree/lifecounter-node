@@ -1,5 +1,5 @@
 $(function() {
-    var socket = io.connect('http://lifecounter.herokuapp.com/');
+    var socket = io.connect(location.origin);
 
     // サーバーと接続したタイミングでライフを取得（初期値はサーバーで生成している）
     socket.on('connect', function() {
@@ -31,21 +31,17 @@ $(function() {
         for (var i = 0, l = tr.length; i < l; i++) {
             var cells = tr.eq(i).children(); //1行目から順にth、td問わず列を取得
             var name = cells.eq(1).text();
-            console.log("** > " + name + ":" + data[name]);
             if (typeof data[name] !== "undefined") {
-                console.log("defined");
                 cells.eq(2).text(data[name]);
                 delete data[name];
             }
             else {
-                console.log("undefined");
                 tr.eq(i).remove();
                 continue;
             }
         }
 
         for (var _name in data) {
-            console.log(name + " : " + data[_name]);
             $("#life-table").append(
             $("<tr></tr>").append($("<td></td>").text("x")).append($("<td></td>").text(_name)).append($("<td></td>").text(data[_name])));
         }

@@ -2,6 +2,11 @@
  * Module dependencies.
  */
 
+var TWITTER_CONSUMER_KEY = process.env.TWITTER_CONSUMER_KEY;
+var TWITTER_CONSUMER_SECRET = process.env.TWITTER_CONSUMER_SECRET;
+var TWITTER_CALL_BACK_URL = process.env.TWITTER_CALL_BACK_URL;
+var ADMINISTRATOR = process.env.ADMINISTRATOR;
+
 var express = require('express'),
     routes = require('./routes'),
     http = require('http'),
@@ -58,9 +63,6 @@ app.get('/', function(req, res) {
     console.log('app.get(/)');
     if (req.isAuthenticated()) {
         req.session.user_name = passport.session.profile.username;
-        //      if(req.session.user_name in userList){
-        //        delete userList[req.session.user_name];
-        //      }
         res.render('index', {
             login_status: 'logout',
             login_url: '/logout/twitter'
@@ -85,27 +87,42 @@ app.get('/login', function(req, res) {
 });
 
 app.get('/exit', function(req, res) {
-    console.log('app.get(/)');
+    console.log('app.get(/exit)');
     if (req.isAuthenticated()) {
         var _room = userList[req.session.user_name];
         console.log('already entered room:' + userList[req.session.user_name]);
         delete roomList[_room][req.session.user_name];
         console.log('remove ' + req.session.user_name + ' from ' + userList[req.session.user_name]);
-        delete userList[req.session.user_name];
-        console.log('remove ' + req.session.user_name + ' from userList');
-        if (roomList[_room].length === 0) {
+        var length;
+        for( var key in roomList[_room] ){ length++; } 
+        console.log(length);
+        if (length === 0) {
+            console.log('delete room : ' + _room);
             delete roomList[_room];
         }
+        delete userList[req.session.user_name];
+        console.log('remove ' + req.session.user_name + ' from userList');
+
     }
     res.redirect('/');
 });
 
 app.get('/check', function(req, res) {
-    console.log('-----userList-----');
-    console.log(userList);
-    console.log('-----roomList-----');
-    console.log(roomList);
-    res.render('check');
+    if (req.isAuthenticated() && req.session.user_name == 't_tree') {
+        res.render('check', {
+            userList: userList,
+            roomList: roomList
+        })
+    }
+    else {
+        res.redirect('/');
+    }
+});
+
+app.get('/clear', function(req, res) {
+    roomList = new Object();
+    userList = new Object();
+    res.redirect('/check');
 })
 
 app.get('/create', function(req, res) {
@@ -135,6 +152,7 @@ app.get('/create', function(req, res) {
                 roomList[room] = {};
                 roomList[room][req.session.user_name] = 20;
                 userList[req.session.user_name] = room;
+                console.log(roomList[room].length);
                 break;
             }
         }
@@ -225,11 +243,6 @@ passport.deserializeUser(function(obj, done) {
     done(null, obj);
 });
 
-//ここからTwitter認証の記述
-var TWITTER_CONSUMER_KEY = process.env.TWITTER_CONSUMER_KEY;
-var TWITTER_CONSUMER_SECRET = process.env.TWITTER_CONSUMER_SECRET;
-var TWITTER_CALL_BACK_URL = process.env.TWITTER_CALL_BACK_URL
-
 passport.use(new TwitterStrategy({
     consumerKey: TWITTER_CONSUMER_KEY,
     consumerSecret: TWITTER_CONSUMER_SECRET,
@@ -302,12 +315,6 @@ function cleanRoom(req) {
 var io = require('socket.io').listen(server);
 
 io.configure(function () {
-   //HerokuではWebSocketがまだサポートされていない？ので、以下の設定が必要 
-    io.set("transports", ["xhr-polling"]); 
-    io.set("polling duration", 10); 
-
-    // socket.ioのログ出力を抑制する
-    io.set('log level', 1);
 });
 
 io.set('authorization', function(handshakeData, callback) {
@@ -355,48 +362,45 @@ var counter = io.sockets.on('connection', function(socket) {
     var handshake = socket.handshake;
     socket.on('init', function() {
         console.log("socket.on(init)");
-        socket.set('room', userList[handshake.session.user_name]);
-        socket.set('name', handshake.session.user_name);
-        var room = userList[handshake.session.user_name];
+        var room = getRoomNumber();
+        socket.set('room', room);
+        socket.set('name', getUserName());
         socket.join(room);
     });
 
 
     socket.on("getMyLife", function() {
         console.log("socket.on(getMyLife)");
-        var room = userList[handshake.session.user_name];
-        socket.emit('returnMyLife', roomList[room][handshake.session.user_name]);
+        socket.emit('returnMyLife', getLife());
     });
 
     socket.on("getMyRoomNumber", function() {
         console.log("socket.on(getMyRoomNumber)");
-        var room = userList[handshake.session.user_name];
-        socket.emit('returnMyRoomNumber', room);
+        socket.emit('returnMyRoomNumber', getRoomNumber());
     });
 
     socket.on("getLifeTable", function() {
         console.log("socket.on(getLifeTable)");
-        var room = userList[handshake.session.user_name];
-        socket.emit('updateLifeTable', roomList[room]);
-        counter.to(room).emit('updateLifeTable', roomList[room]);
+        var roomData = getRoomData();
+        socket.emit('updateLifeTable', roomData);
+        counter.to(getRoomNumber()).emit('updateLifeTable', roomData);
     });
 
 
     socket.on("lifeUpdate", function(val) {
         console.log("socket.on(lifeUpdate)");
-        var room = userList[handshake.session.user_name];
-        roomList[room][handshake.session.user_name] += val;
-        socket.emit('returnMyLife', roomList[room][handshake.session.user_name]);
-        socket.emit('updateLifeTable', roomList[room]);
-        counter.to(room).emit('updateLifeTable', roomList[room]);
+        setLife(getLife()+val);
+        socket.emit('returnMyLife', getLife());
+        socket.emit('updateLifeTable', getRoomData());
+        counter.to(getRoomNumber()).emit('updateLifeTable', getRoomData());
     });
 
     socket.on("lifeSet", function(val) {
         console.log("socket.on(lifeSet)");
-        var room = userList[handshake.session.user_name];
-        roomList[room][handshake.session.user_name] = val;
-        socket.emit('returnMyLife', roomList[room][handshake.session.user_name]);
-        socket.emit('updateLifeTable', roomList[room]);
+        setLife(val);
+        socket.emit('returnMyLife', getLife());
+        socket.emit('updateLifeTable', getRoomData());
+        counter.to(getRoomNumber()).emit('updateLifeTable', getRoomData());
     });
 
     //接続が解除された時に実行する
@@ -409,4 +413,24 @@ var counter = io.sockets.on('connection', function(socket) {
 
         socket.leave(room);
     });
+    
+    function getUserName(){
+        return handshake.session.user_name;
+    }
+    
+    function getRoomNumber(){
+        return userList[getUserName()];
+    }
+    
+    function getLife(){
+        return roomList[getRoomNumber()][getUserName()];
+    }
+    
+    function setLife(val){
+        roomList[getRoomNumber()][getUserName()] = val
+    }
+    
+    function getRoomData(){
+        return roomList[getRoomNumber()];
+    }
 });

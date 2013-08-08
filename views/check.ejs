@@ -21,7 +21,49 @@
             <form action="/check" method="get">
                 <button class="btn">check</button>
             </form>
-        </div>
+            <form action="/clear" method="get">
+                <button class="btn">clear</button>
+            </form>
+            <hr/>
+            <h2>userlist</h2>
+            <table class="table table-condensed" id="life-table">
+                <thead>
+                    <tr>
+                        <th>name</th>
+                        <th>roomNumber</th>
+                    </tr>
+                </thead>
+                <tbody>
+                <% for(var key in userList){ %>
+                    <tr>
+                        <th><%= key %></th>
+                        <th><%= userList[key] %></th>
+                    </tr>
+                <% } %>
+                </tbody>
+            </table>
+            <hr/>
+            <h2>roomList</h2>
+            <% for(var room in roomList) { %>
+                <h4>room number: <%= room %></h4>
+                <table class="table table-condensed" id="life-table">
+                    <thead>
+                        <tr>
+                            <th>name</th>
+                            <th>life</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    <% for(var key in roomList[room]){ %>
+                        <tr>
+                            <th><%= key %></th>
+                            <th><%= roomList[room][key] %></th>
+                        </tr>
+                    <% } %>
+                    </tbody>
+                </table>
+            <% } %>
+            </div>
     </body>
 
 </html>
