@@ -47,25 +47,30 @@
                 </tbody>
             </table>
             <hr/>
+            
             <h2>roomList</h2>
             <% for(var room in roomList) { %>
-                <h4>room number: <%= room %></h4>
-                <table class="table table-condensed" id="life-table">
-                    <thead>
-                        <tr>
-                            <th>name</th>
-                            <th>life</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    <% for(var key in roomList[room]){ %>
-                        <tr>
-                            <th><%= key %></th>
-                            <th><%= roomList[room][key] %></th>
-                        </tr>
-                    <% } %>
-                    </tbody>
-                </table>
+                <div class="panel">
+                    <div class="panel-heading">
+                        <h4>room number: <%= room %></h4>
+                    </div>
+                    <table class="table table-condensed" id="life-table">
+                        <thead>
+                            <tr>
+                                <th class="col-lg-4">name</th>
+                                <th class="col-lg-8">life</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        <% for(var key in roomList[room]){ %>
+                            <tr>
+                                <th><%= key %></th>
+                                <th><%= roomList[room][key] %></th>
+                            </tr>
+                        <% } %>
+                        </tbody>
+                    </table>
+                </div>
             <% } %>
             </div>
     </body>

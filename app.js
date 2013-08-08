@@ -68,17 +68,16 @@ if ('development' == app.get('env')) {
 app.get('/', function(req, res) {
     console.log('app.get(/)');
     if (req.isAuthenticated()) {
-        req.session.user_name = passport.session.profile.username;
         res.render('index', {
             login_status: 'logout',
             login_url: '/logout/twitter',
             alerts: req.flash('alert'),
             infos: req.flash('info'),
-            resume: req.session.user_name in userList
+            resume: req.session.user_name in userList,
+            user_name: req.session.user_name
         });
     }
     else {
-        req.flash('alert','Twitterでログインしてください。');
         res.redirect('/login');
     }
 });
@@ -98,39 +97,22 @@ app.get('/login', function(req, res) {
     }
 });
 
-app.get('/exit', function(req, res) {
-    console.log('app.get(/exit)');
+app.get('/room', function(req, res) {
+    console.log('app.get(room)');
     if (req.isAuthenticated()) {
-        if(req.session.user_name in userList){
-            removeFromRoomList(req);
-            deleteUserList(req);
-            req.flash('info','退出しました。');
+        if(userList[req.session.user_name]){
+            console.log('res.render(room)');
+            res.render("room");
         } else {
-            console.log('untill entered room');
+            console.log('res.redirect(/)');
             req.flash('alert','まだ部屋に入っていません。');
+            res.redirect('/');
         }
-        res.redirect('/');
-    } else {
-        res.redirect('/');
-    }
-});
-
-app.get('/check', function(req, res) {
-    if (req.isAuthenticated() && req.session.user_name == 't_tree') {
-        res.render('check', {
-            userList: userList,
-            roomList: roomList
-        });
     }
     else {
+        console.log('res.redirect(/)');
         res.redirect('/');
     }
-});
-
-app.get('/clear', function(req, res) {
-    roomList = {};
-    userList = {};
-    res.redirect('/check');
 });
 
 app.get('/create', function(req, res) {
@@ -163,6 +145,7 @@ app.get('/create', function(req, res) {
     }
     else {
         console.log('res.redirect(/)');
+        setAlertForNotLogined(req);
         res.redirect('/');
     }
 });
@@ -185,7 +168,7 @@ app.post('/join', function(req, res) {
         }
 
         // 作成されていない部屋の場合は/にredirect
-        if (typeof roomList[room] === "undefined") {
+        if (!(room in roomList)) {
             console.log('illeagle room Number');
             req.flash('alert','作成されていない部屋です。');
             res.redirect('/');
@@ -208,25 +191,50 @@ app.post('/join', function(req, res) {
     }
     else {
         console.log('res.redirect(/)');
+        setAlertForNotLogined(req);
         res.redirect('/');
     }
 });
 
-
-app.get('/room', function(req, res) {
-    console.log('app.get(room)');
+app.get('/exit', function(req, res) {
+    console.log('app.get(/exit)');
     if (req.isAuthenticated()) {
-        if(userList[req.session.user_name]){
-            console.log('res.render(room)');
-            res.render("room");
+        if(req.session.user_name in userList){
+            removeFromRoomList(req);
+            deleteUserList(req);
+            req.flash('info','退出しました。');
         } else {
-            console.log('res.redirect(/)');
+            console.log('untill entered room');
             req.flash('alert','まだ部屋に入っていません。');
-            res.redirect('/');
         }
+        res.redirect('/');
+    } else {
+        setAlertForNotLogined(req);
+        res.redirect('/');
+    }
+});
+
+app.get('/check', function(req, res) {
+    if (req.isAuthenticated() && req.session.user_name == 't_tree') {
+        res.render('check', {
+            userList: userList,
+            roomList: roomList
+        });
     }
     else {
-        console.log('res.redirect(/)');
+        req.flash('alert','無効なurlです。');
+        res.redirect('/');
+    }
+});
+
+app.get('/clear', function(req, res) {
+    if (req.isAuthenticated() && req.session.user_name == 't_tree') {
+        roomList = {};
+        userList = {};
+        res.redirect('/check');
+    }
+    else {
+        req.flash('alert','無効なurlです。');
         res.redirect('/');
     }
 });
@@ -238,17 +246,26 @@ function deleteUserList(_req){
 }
 
 function removeFromRoomList(_req){
-    var _room = userList[_req.session.user_name];
-    console.log('already entered room:' + userList[_req.session.user_name]);
-    delete roomList[_room][_req.session.user_name];
-    console.log('remove ' + _req.session.user_name + ' from ' + userList[_req.session.user_name]);
-    var length = 0;
-    for( var key in roomList[_room] ){ length++; } 
-    console.log(length);
-    if (length === 0) {
-        console.log('delete room : ' + _room);
-        delete roomList[_room];
-    }
+    
+    if(_req.session.user_name in userList){
+        var _room = userList[_req.session.user_name];
+        console.log('already entered room:' + userList[_req.session.user_name]);
+        if(_room in roomList && _req.session.user_name in roomList[_room]){
+            delete roomList[_room][_req.session.user_name];
+            console.log('remove ' + _req.session.user_name + ' from ' + userList[_req.session.user_name]);
+            var length = 0;
+            for( var key in roomList[_room] ){ length++; } 
+            console.log(length);
+            if (length === 0) {
+                console.log('delete room : ' + _room);
+                delete roomList[_room];
+            }
+        }    
+    }    
+}
+
+function setAlertForNotLogined(_req){
+    _req.flash('alert','Twitterでログインしてください。');
 }
 
 var server = http.createServer(app).listen(app.get('port'), function() {
@@ -300,15 +317,18 @@ passport.authenticate('twitter', {
 
 function(req, res) {
     console.log('app.get(/auth/twitter/callback)');
-    console.log(passport.profile);
+    req.session.user_name = req.user.username;
+    console.log(req.user.username);
     //    req.session.user_name = passport.profile.username;
     res.redirect('/');
 });
 
 app.get('/logout/twitter', function(req, res) {
-    cleanRoom(req);
+    removeFromRoomList(req);
+    deleteUserList(req);
+
     req.logout();
-    req.flash('info','ログアウトしました。');
+    req.flash('info', 'ログアウトしました。');
     res.redirect('/login');
 });
 
@@ -318,22 +338,7 @@ function twitterEnsureAuthenticated(req, res, next) {
     }
     res.redirect('/login/twitter');
 }
-function cleanRoom(req) {
-    // ルームに参加しているか
-    if (typeof userList[req.session.user_name] !== "undefined") {
-        console.log('already entered room:' + _room);
 
-        var _room = userList[req.session.user_name];
-        delete roomList[_room][req.session.user_name];
-        console.log('remove ' + req.session.user_name + ' from ' + userList[req.session.user_name]);
-        delete userList[req.session.user_name];
-        console.log('remove ' + req.session.user_name + ' from userList');
-        if (roomList[_room].length === 0) {
-            delete roomList[_room];
-        }
-    }
-}
-    
 var io = require('socket.io').listen(server);
 
 io.configure(function() {
