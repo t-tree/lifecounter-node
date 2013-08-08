@@ -93,7 +93,7 @@ app.get('/exit', function(req, res) {
         console.log('already entered room:' + userList[req.session.user_name]);
         delete roomList[_room][req.session.user_name];
         console.log('remove ' + req.session.user_name + ' from ' + userList[req.session.user_name]);
-        var length;
+        var length = 0;
         for( var key in roomList[_room] ){ length++; } 
         console.log(length);
         if (length === 0) {
@@ -427,7 +427,7 @@ var counter = io.sockets.on('connection', function(socket) {
     }
     
     function setLife(val){
-        roomList[getRoomNumber()][getUserName()] = val
+        roomList[getRoomNumber()][getUserName()] = val;
     }
     
     function getRoomData(){

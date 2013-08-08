@@ -17,14 +17,18 @@
     </head>
     
     <body>
+        <div class="navbar navbar-inverse navbar-fixed-top bs-docs-nav">
+            <div class="container">
+                <div class="btn-toolbar" style="text-align: right">
+                    <a type="button" class="btn btn-primary navbar-btn btn-small" style="text-align: right"
+                    href="/check">check</a>
+                    <a type="button" class="btn btn-primary navbar-btn btn-small" style="text-align: right"
+                    href="/clear">clear</a>
+                </div>
+            </div>
+        </div>
+
         <div class="container">
-            <form action="/check" method="get">
-                <button class="btn">check</button>
-            </form>
-            <form action="/clear" method="get">
-                <button class="btn">clear</button>
-            </form>
-            <hr/>
             <h2>userlist</h2>
             <table class="table table-condensed" id="life-table">
                 <thead>
