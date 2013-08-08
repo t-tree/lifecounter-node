@@ -23,6 +23,24 @@
                 <div class="btn-toolbar" style="text-align: right"></div>
             </div>
         </div>
+        <% var cnt=0; %>
+        <% for(var key in alerts){cnt++} %>
+        <% if(cnt>0) { %>
+            <div class="alert alert-danger">
+                <% for(var alert in alerts){ %>
+                <%= alerts[alert] %><br>
+                <% } %>
+            </div>
+        <% } %>
+        <% cnt =0; %>
+        <% for(var key in infos){cnt++} %>
+        <% if(cnt>0) { %>
+            <div class="alert alert-info">
+                <% for(var info in infos){ %>
+                <%= infos[info] %><br>
+                <% } %>
+            </div>
+        <% } %>
         <div class="container" style="margin:10px">
             <div class="page-header">
                 <h1>Life-counter</h1>

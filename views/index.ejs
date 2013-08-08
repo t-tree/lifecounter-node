@@ -21,19 +21,33 @@
             <div class="container">
                 <div class="btn-toolbar" style="text-align: left;float: left;"></div>
                 <div class="btn-toolbar" style="text-align: right">
-                    <a type="button" class="btn btn-primary navbar-btn btn-small" style="text-align: right"
-                    href=" 
-            <%= login_url %>">
-            <%= login_status %>
-          </a>
+                    <a type="button" class="btn btn-primary navbar-btn btn-small" style="text-align: right" href="<%= login_url %>"><%= login_status %>          </a>
                 </div>
             </div>
         </div>
-        <div class="container" style="margin:10px">
-            <div class="page-header">
-                <h1>Life-counter</h1>
-                <p>Welcome to Life-counter</p>
+        <div class="page-header">
+            <h1>Life-counter</h1>
+            <p>Welcome to Life-counter</p>
+        </div>
+        <% var cnt=0; %>
+        <% for(var key in alerts){cnt++} %>
+        <% if(cnt>0) { %>
+            <div class="alert alert-danger">
+                <% for(var alert in alerts){ %>
+                <%= alerts[alert] %><br>
+                <% } %>
             </div>
+        <% } %>
+        <% cnt =0; %>
+        <% for(var key in infos){cnt++} %>
+        <% if(cnt>0) { %>
+            <div class="alert alert-info">
+                <% for(var info in infos){ %>
+                <%= infos[info] %><br>
+                <% } %>
+            </div>
+        <% } %>
+        <div class="container" style="margin:10px">
             <div style="margin:20px">
                 <form class="form-inline" action="/create" method="get" style="margine-top: 20px;">
                     <fieldset>
@@ -51,9 +65,16 @@
                     </div>
                 </form>
             </div>
-            <div style="margin:20px">
-                <a class="btn btn-default" href="/room">再開</a>
-            </div>
+            <% if(resume){ %>
+                <div style="margin:20px">
+                    <a class="btn btn-default" href="/room">再開</a>
+                </div>
+            <% } else { %>
+                <div style="margin:20px">
+                    <a class="btn btn-default" disabled="disabled">再開</a>
+                </div>
+            
+            <% } %>
         </div>
     </body>
 

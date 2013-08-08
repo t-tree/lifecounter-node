@@ -8,13 +8,13 @@ var TWITTER_CALL_BACK_URL = process.env.TWITTER_CALL_BACK_URL;
 var ADMINISTRATOR = process.env.ADMINISTRATOR;
 
 var express = require('express'),
-    routes = require('./routes'),
     http = require('http'),
     path = require('path'),
     connect = require('connect'),
     Session = express.session.Session,
     passport = require('passport'),
-    TwitterStrategy = require('passport-twitter').Strategy;
+    TwitterStrategy = require('passport-twitter').Strategy,
+    flash = require('connect-flash');
 
 var sessionStore = new express.session.MemoryStore();
 
@@ -46,13 +46,15 @@ app.configure(function() {
         user_name: "",
         access_token: ""
     }));
+    
+    app.use(flash());
 
     app.use(app.router);
     app.use(express.static(path.join(__dirname, 'public')));
 });
 
-var roomList = new Object();
-var userList = new Object();
+var roomList = {};
+var userList = {};
 
 // development only
 if ('development' == app.get('env')) {
@@ -65,10 +67,14 @@ app.get('/', function(req, res) {
         req.session.user_name = passport.session.profile.username;
         res.render('index', {
             login_status: 'logout',
-            login_url: '/logout/twitter'
+            login_url: '/logout/twitter',
+            alerts: req.flash('alert'),
+            infos: req.flash('info'),
+            resume: req.session.user_name in userList
         });
     }
     else {
+        req.flash('alert','Twitterでログインしてください。');
         res.redirect('/login');
     }
 });
@@ -81,7 +87,9 @@ app.get('/login', function(req, res) {
     else {
         res.render('login', {
             login_status: 'login',
-            login_url: '/login/twitter'
+            login_url: '/login/twitter',
+            alerts: req.flash('alert'),
+            infos: req.flash('info')
         });
     }
 });
@@ -112,7 +120,7 @@ app.get('/check', function(req, res) {
         res.render('check', {
             userList: userList,
             roomList: roomList
-        })
+        });
     }
     else {
         res.redirect('/');
@@ -120,10 +128,10 @@ app.get('/check', function(req, res) {
 });
 
 app.get('/clear', function(req, res) {
-    roomList = new Object();
-    userList = new Object();
+    roomList = {};
+    userList = {};
     res.redirect('/check');
-})
+});
 
 app.get('/create', function(req, res) {
     console.log('app.get(create)');
@@ -178,6 +186,7 @@ app.post('/join', function(req, res) {
         else {
             // だめなら/にredirect
             console.log('req.body.room is empty');
+            req.flash('alert','部屋番号を入力してください。');
             res.redirect('/');
             return;
         }
@@ -185,6 +194,7 @@ app.post('/join', function(req, res) {
         // 作成されていない部屋の場合は/にredirect
         if (typeof roomList[room] === "undefined") {
             console.log('illeagle room Number');
+            req.flash('alert','作成されていない部屋です。');
             res.redirect('/');
             return;
         }
@@ -207,7 +217,7 @@ app.post('/join', function(req, res) {
             roomList[room][req.session.user_name] = 20;
             userList[req.session.user_name] = room;
         }
-        console.log('res.render(/room)');
+        console.log('res.redirect(/room)');
         res.redirect("/room");
     }
     else {
@@ -219,9 +229,15 @@ app.post('/join', function(req, res) {
 
 app.get('/room', function(req, res) {
     console.log('app.get(room)');
-    if (req.isAuthenticated() && userList[req.session.user_name]) {
-        console.log('res.render(room)');
-        res.render("room");
+    if (req.isAuthenticated()) {
+        if(userList[req.session.user_name]){
+            console.log('res.render(room)');
+            res.render("room");
+        } else {
+            console.log('res.redirect(/)');
+            req.flash('alert','まだ部屋に入っていません。');
+            res.redirect('/');
+        }
     }
     else {
         console.log('res.redirect(/)');
@@ -286,6 +302,7 @@ function(req, res) {
 app.get('/logout/twitter', function(req, res) {
     cleanRoom(req);
     req.logout();
+    req.flash('info','ログアウトしました。');
     res.redirect('/');
 });
 
@@ -296,7 +313,6 @@ function twitterEnsureAuthenticated(req, res, next) {
     res.redirect('/login/twitter');
 }
 function cleanRoom(req) {
-
     // ルームに参加しているか
     if (typeof userList[req.session.user_name] !== "undefined") {
         console.log('already entered room:' + _room);
@@ -314,7 +330,13 @@ function cleanRoom(req) {
     
 var io = require('socket.io').listen(server);
 
-io.configure(function () {
+io.configure(function() {
+    //HerokuではWebSocketがまだサポートされていない？ので、以下の設定が必要                                                                                                                                                                       
+    io.set("transports", ["xhr-polling"]);
+    io.set("polling duration", 10);
+
+    // socket.ioのログ出力を抑制する                                                                                                                                                                                            
+    io.set('log level', 1);
 });
 
 io.set('authorization', function(handshakeData, callback) {
