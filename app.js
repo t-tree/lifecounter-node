@@ -345,6 +345,7 @@ io.configure(function() {
     //HerokuではWebSocketがまだサポートされていない？ので、以下の設定が必要                                                                                                                                                                       
     io.set("transports", ["xhr-polling"]);
     io.set("polling duration", 60);
+    io.set('heartbeat interval', 180); 
 
     // socket.ioのログ出力を抑制する                                                                                                                                                                                            
     io.set('log level', 1);
