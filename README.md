@@ -1,27 +1,49 @@
-    ,-----.,--.                  ,--. ,---.   ,--.,------.  ,------.
-    '  .--./|  | ,---. ,--.,--. ,-|  || o   \  |  ||  .-.  \ |  .---'
-    |  |    |  || .-. ||  ||  |' .-. |`..'  |  |  ||  |  \  :|  `--, 
-    '  '--'\|  |' '-' ''  ''  '\ `-' | .'  /   |  ||  '--'  /|  `---.
-     `-----'`--' `---'  `----'  `---'  `--'    `--'`-------' `------'
-    ----------------------------------------------------------------- 
+LifeCounter
+======================
+Webで使えるTCG（MTG）向けライフカウンター。 
+ 
+Twitter認証で参加してルームを作成。  
+対戦相手にルームに参加してもらえば後はいわゆるライフカウンターアプリと同じように動きます。
+
+### 特徴 ###
++ 部屋に参加している全ての人のライフを見ることができます
++ socket.ioを使っているので全員のライフがある程度リアルタイムに同期します
+
+### 注意 ###
++ 携帯端末なんかで使うとバッテリーの減りが激しいです
++ 作者の勉強がてらつくったところが大きく、コードはあまり美しくないです。
++ 後述しますが、いろいろ環境変数などの設定が必要になります。
 
 
-Hi there! Welcome to Cloud9 IDE!
+使い方
+------
+### 準備 ###
 
-To get you started, we have created a small hello world application.
+下記の項目を設定する必要があります  
+export TWITTER_CONSUMER_KEY= TwitterのCONSUMER key  
+export TWITTER_CONSUMER_SECRET=TwitterのSeacret Key  
+export TWITTER_CALL_BACK_URL=Twitterのコールバックキー  
+export ADMINISTRATOR=管理者のTwitterID  
 
-1) Open the hello-world.js file
+### 実行方法 ###
 
-2) Follow the run instructions in the file's comments
-    
-And that's all there is to it! Just have fun. Go ahead and edit the code, 
-or add new files. It's all up to you! 
+node app.js 
 
-Happy coding!
-The Cloud9 IDE team
+で起動するはず。
+ 
+ 
+参考にした情報
+--------
+色々参考にさせてもらったのでなるべく書きます。   
+しばらくお待ちを。。
+ 
+今後の予定
+--------
+いろいろ使ってみて問題とか欲しい機能とかあるので作る予定。
 
-
-## Support & Documentation
-
-Visit http://docs.c9.io for documentation, or http://support.c9.io for support.
-To watch some training videos, visit http://www.youtube.com/user/c9ide
+ライセンス
+----------
+Copyright &copy; 2013 Masaki Naito  
+Licensed under the [Apache License, Version 2.0][Apache]
+ 
+[Apache]: http://www.apache.org/licenses/LICENSE-2.0
